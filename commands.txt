@@ -1,0 +1,30 @@
+p 1 20
+p 0 0
+p   0    1
+p 2 0
+p    3   3
+m m
+m m
+m m
+m m
+
+p 4 5
+p 4 5
+p 4 4
+m m
+m m
+
+   p 5 0
+p 1 1
+m m
+m m
+m m
+
+p 0 5
+m m
+m m
+m m
+
+     
+m
+m f

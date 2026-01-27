@@ -1,0 +1,76 @@
+Name: Adetoye Adebayo
+utln: aadeba02    
+
+Answer the questions below, and submit your answers under the assignment
+"MetroSim Design Checkoff" on Gradescope. You must sign up for a design
+checkoff slot with a TA to discuss your provided answers (see spec for link).
+
+Unless otherwise specified, your answers below should be *brief*: no more
+than three sentences/question.
+
+        
+1. Are you comfortable with reading from stdin (user input) and a text file 
+in C++? Are you comfortable reading different types (e.g. ints and strings)?
+For this one, don't just answer 'yes' if you are. Write out which data 
+types you will need and which functions you will call. 
+
+Answer: Yes. I’ll read from files with std::ifstream and from the
+keyboard with std::cin. I’ll use std::getline for std::string and >>
+for int. I’ll parse command lines with std::istringstream. 
+
+2. What happens when I move the train (with 'm m') when the train is at the
+last provided station? 
+
+Answer: It wraps around. From the last station, m m moves the train to
+station 0 (first station).
+
+3. What classes will you need in your program? What interfaces (i.e. 
+functions) do they each provide? 
+
+Answer: Passenger (id/start/end, print). PassengerQueue (enqueue,
+dequeue, front, size, print). MetroSim (load stations, run commands, move
+train, board/unload, print state, log exits).
+
+4. How will you implement add a passenger to a station? How will this 
+impact the data structure(s) you use to represent the stations in the 
+simulation? 
+
+Answer: When I read p A B, I make a Passenger (start=A, end=B) and put
+them at the end of station A’s waiting line. I will store stations as a
+std::vector<PassengerQueue>, one queue per station number. This makes adding
+and later boarding simple.
+
+5. How will you implement moving a train from one station into the next? 
+How will you put passengers onto the train? How will you take off the
+correct passengers who are leaving at the next station? How will these 
+considerations impact the data structure(s) you use to represent the 
+train in the simulation? 
+
+Answer: Board: move all waiting at the current station onto the train.
+Move: go to (cur+1) % N. 
+Unload: remove all riders whose destination is the new station and log
+them. The train is a std::vector<PassengerQueue> keyed by destination.
+
+6. Does command behavior change based on the source of commands? 
+Based on your answer, how could we modularize our command processing
+code? Be as detailed as you can.
+
+Answer: Commands work the same no matter where they come from. I’ll write one
+function processCommands(std::istream& in) that reads and handles them.
+If there’s a file, I pass its streama and if not, I pass std::cin. The
+prompt looks slightly different though, std::cin echoes the typed command, 
+while a file does not (you might see Command? Passengers on the train: 
+on one line) but this is expected. 
+
+7. How do you plan to test your program? What evidence of testing do
+you plan to submit? 
+
+Answer: I plan to use unit tests for testing edge cases. End-to-end runs that
+diff my output with the reference. I’ll submit the tests and sample input 
+files.
+
+8. What is your timeline for completing this project? What would you like 
+to have completed, and by which dates?   
+
+Answer: Today: Phase 1 and checkoff. Next 2–3 days: parsing, p, m m,
+printing. Then: logging, wrap-around, final tests, Makefile/README polish.

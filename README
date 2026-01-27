@@ -1,0 +1,141 @@
+/**********************************************************
+* Adetoye Adebayo aadeba02
+* Project 1: Metro Simulator
+* CS 15
+* README
+*
+*********************************************************/
+
+Compile/run:
+     - Compile using
+            make MetroSim
+     - run executable with
+            ./MetroSim stationsFile passFile [commands]
+     - Run with a command file:
+            ./MetroSim stations.txt output.txt commands.txt
+     - Save stdout for diff:
+            ./MetroSim stations.txt outputFile.txt < test_commands.txt >
+            my.output
+            ./the_MetroSim stations.txt outputFile.txt < test_commands.txt 
+            > ref.output
+            diff ref.output my.output
+     - Feed commands via stdin:
+            ./MetroSim stations.txt output.txt < commands.txt
+
+
+Program Purpose:
+MetroSim is a small train simulator. It reads station names, then
+processes simple commands to add riders, move the train, unload riders
+at their stop, and log exits. After each command it prints the full
+state like who is on the train, and who is waiting at each station.
+
+
+Acknowledgements: Used ideas from the CS15 lab and lecture. 
+
+
+Files: 
+
+Passenger.cpp: Implementation of the Passenger class
+
+Passenger.h: Interface of the Passenger class with id, start station, end
+station, and print.
+
+PassengerQueue.h: Interface of the PassengerQueue class with FIFO queue of
+Passenger with front, enqueue, dequeue, size, and print.
+
+PassengerQueue.cpp: Implementation of PassengerQueue using std::list;
+supports enqueue/dequeue/front/size/print and throws on empty front/dequeue.
+
+unit_tests.h: Tests for Passenger and PassengerQueue so far, checks
+constructors, getters, print format, FIFO order, size updates, and
+exceptions.
+
+MetroSim.h:
+Interface of the MetroSim class. Holds station names, one waiting
+queue per station, train buckets by destination, the current
+station index, and the next passenger id. Declares printing,
+boarding, unloading, and the command loop.
+
+MetroSim.cpp:
+Implementation of MetroSim. Prints state, boards riders at the
+current station, moves the train with wrap-around, unloads riders
+at arrival (and logs them), and runs the command loop that reads
+commands from a stream.
+
+main.cpp:
+Driver. Parses command-line args, opens files, reads station names,
+builds MetroSim, prints the initial state, and runs the command
+loop (from stdin or from a commands file). Writes exit logs to the
+output file.
+
+stations.txt:
+     an example file containing a list of stations.
+
+test_commands.txt:
+     sample list of commands that you could give to the simulator
+
+the_metroSim:
+     reference implementation for students to see how 
+
+commands.txt, commands2.txt, commands3.txt, commands4.txt:
+Larger command scripts for more cases: multiple passengers,
+wrap-around, consecutive moves, mixed spacing and blank lines.
+
+orangeLine.txt:
+A second station list (The Boston Orange line) to test that the program
+works with any set of station names.
+
+
+Data Structures:
+Stations are stored in a vector of PassengerQueue. Each stations[i] is the 
+waiting line at station i and follows FIFO order. The train keeps a vector
+of PassengerQueue named trainByDest, where trainByDest[d] holds riders
+whose destination is station d. This makes unloading easy on arrival
+because we simply empty that one bucket. The simulator also tracks cur,
+the index of the current station, and nextId, the next rider id. The
+key rules are clear: a rider is either waiting at a station or 
+riding in exactly one train bucket, never both. Moving the train means
+add one to cur and wrap around using the number of stations N (cur + 1)
+% N. At every stop we unload first and then board.
+
+Architectural Overview: 
+On start, main.cpp reads station names, creates MetroSim, prints the
+initial state, then runs processCommands. The command loop reads one
+line at a time. For "p A B" it creates a new Passenger with id
+nextId and enqueues it at stations[A]. For "m m" it boards everyone
+waiting at cur into the train buckets keyed by destination, advances
+cur with wrap-around, unloads everyone whose destination is the new
+cur (and logs each exit), then prints the state. For "m f" it prints
+the goodbye message and exits. Any other or blank line simply prints
+the current state again to match the demo’s feel. All printing follows
+the format: first the train line, then each station with
+"TRAIN:" in front of the current station line and spaces elsewhere.
+
+
+Testing:
+
+I tested in three ways. First, I wrote small unit tests for Passenger
+and PassengerQueue to check constructors, getters, print format, FIFO
+order, size changes, and the errors thrown when calling front or
+dequeue on an empty queue. These tests ran fast and caught mistakes 
+early. Second, I ran command scripts from files and captured stdout, 
+then used diff with the reference run that used the same inputs. The 
+scripts covered an empty start, a single rider, many riders to one stop, 
+riders to many stops, boarding followed by moving, wrap around, and lines 
+that have extra spaces or are blank. Third, I swapped the station list 
+with orangeLine.txt to confirm the code does not depend on specific 
+names. I also checked that exit logs follow “Passenger X left train 
+at station NAME” and that riders only appear on the train between their 
+start and end stations. I verified that queues never underflow by 
+checking sizes before front or dequeue.
+
+
+Part that you found most difficult:
+
+Matching the exact print format (indentation, braces, spacing)
+(aka passing diff) and keeping the order right at stops 
+(unload before board) took the most care. Getting file I/O 
+and command parsing to work with both stdin and a commands file 
+was also a common source of small bugs early on.
+
+Time Spent: I spent about 14 hours on this assignment. 
